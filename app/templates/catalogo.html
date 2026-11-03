@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Catálogo{% endblock %}
+{% block contenido %}
+<h1>Catálogo de productos</h1>
+
+{% if productos %}
+<table>
+  <thead>
+    <tr><th>SKU</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Existencias</th><th>Disponible</th></tr>
+  </thead>
+  <tbody>
+    {% for p in productos %}
+    <tr>
+      <td>{{ p.sku }}</td>
+      <td>{{ p.nombre }}</td>
+      <td>{{ p.categoria.value }}</td>
+      <td>${{ "%.2f"|format(p.precio) }}</td>
+      <td>{{ p.existencias }}</td>
+      <td>{{ "Sí" if p.disponible else "No" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>El catálogo está vacío.</p>
+{% endif %}
+
+<h2>Agregar producto</h2>
+{% if errores.general %}<p><mark>{{ errores.general }}</mark></p>{% endif %}
+<form method="post" action="/web/productos">
+  <div class="grid">
+    <label>SKU
+      <input name="sku" placeholder="TEC-001" value="{{ datos.sku }}">
+      {% if errores.sku %}<small>{{ errores.sku }}</small>{% endif %}
+    </label>
+    <label>Nombre
+      <input name="nombre" value="{{ datos.nombre }}">
+      {% if errores.nombre %}<small>{{ errores.nombre }}</small>{% endif %}
+    </label>
+  </div>
+  <div class="grid">
+    <label>Precio
+      <input name="precio" type="number" step="0.01" value="{{ datos.precio }}">
+      {% if errores.precio %}<small>{{ errores.precio }}</small>{% endif %}
+    </label>
+    <label>Existencias
+      <input name="existencias" type="number" value="{{ datos.existencias }}">
+      {% if errores.existencias %}<small>{{ errores.existencias }}</small>{% endif %}
+    </label>
+    <label>Categoría
+      <select name="categoria">
+        {% for c in categorias %}
+        <option value="{{ c.value }}" {% if datos.categoria == c.value %}selected{% endif %}>{{ c.value }}</option>
+        {% endfor %}
+      </select>
+      {% if errores.categoria %}<small>{{ errores.categoria }}</small>{% endif %}
+    </label>
+  </div>
+  <button type="submit">Agregar</button>
+</form>
+{% endblock %}
